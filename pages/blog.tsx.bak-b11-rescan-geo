@@ -1,0 +1,209 @@
+import Head from 'next/head'
+
+import { PRODUCT } from '../lib/product'
+import { buildFaqJsonLd, buildHowToJsonLd } from '../lib/schema'
+
+const SITE = 'https://meal-planner.lxsaihub.com'
+const PUBLISHED = '2026-09-17'
+
+const faqs = [
+  {
+    "question": "What is meal-planner?",
+    "answer": "meal-planner helps teams complete a focused workflow in plain English."
+  },
+  {
+    "question": "Who should use meal-planner?",
+    "answer": "meal-planner is for people who need a fast, explainable result without building the workflow by hand."
+  },
+  {
+    "question": "What do I need to start with meal-planner?",
+    "answer": "Provide the inputs the form asks for; a first pass works from a short description if you do not have a full dataset yet."
+  },
+  {
+    "question": "Does meal-planner replace human judgment?",
+    "answer": "No. It drafts decision-support output you review before you act. Final accountability stays with you."
+  },
+  {
+    "question": "How is meal-planner different from doing it manually?",
+    "answer": "It compresses the first draft and structure so you spend time on judgment, not blank-page setup."
+  },
+  {
+    "question": "When should I not rely on meal-planner alone?",
+    "answer": "Skip sole reliance for regulated, high-stakes, or legally binding decisions — use a qualified professional."
+  }
+] as { question: string; answer: string }[]
+
+const howToBlocks = [
+  {
+    "name": "How to run a first pass with meal-planner",
+    "steps": [
+      {
+        "name": "Open the tool",
+        "text": "Go to https://meal-planner.lxsaihub.com and open the main workspace for meal-planner."
+      },
+      {
+        "name": "Enter your inputs",
+        "text": "Fill the fields the product asks for. Start with the shortest complete input that still reflects your real case."
+      },
+      {
+        "name": "Generate the draft",
+        "text": "Run meal-planner to get a structured draft you can read in plain English."
+      },
+      {
+        "name": "Review before you act",
+        "text": "Edit anything that does not match your context. Treat the output as decision support, not a final authority."
+      }
+    ]
+  }
+] as { name: string; steps: { name: string; text: string }[] }[]
+
+type Post = { slug: string; title: string; type: string; query: string; body: string }
+const posts: Post[] = [
+  {
+    slug: 'what-is-meal-planner',
+    title: 'What is meal-planner?',
+    type: 'Definitional · FAQPage',
+    query: 'what is meal-planner',
+    body: 'meal-planner helps teams complete a focused workflow in plain English.'
+  },
+  {
+    slug: 'who-should-use-meal-planner',
+    title: 'Who should use meal-planner?',
+    type: 'How-to',
+    query: 'who should use meal-planner',
+    body: 'meal-planner is for people who need a fast, explainable result without building the workflow by hand.'
+  },
+  {
+    slug: 'what-do-i-need-to-start-with-meal-planner',
+    title: 'What do I need to start with meal-planner?',
+    type: 'How-to',
+    query: 'what do i need to start with meal-planner',
+    body: 'Provide the inputs the form asks for; a first pass works from a short description if you do not have a full dataset yet.'
+  },
+  {
+    slug: 'does-meal-planner-replace-human-judgment',
+    title: 'Does meal-planner replace human judgment?',
+    type: 'How-to',
+    query: 'does meal-planner replace human judgment',
+    body: 'No. It drafts decision-support output you review before you act. Final accountability stays with you.'
+  },
+  {
+    slug: 'meal-planner-vs-manual',
+    title: 'meal-planner vs doing it manually',
+    type: 'Comparison',
+    query: 'meal-planner vs manual',
+    body: 'Use meal-planner when you need a fast, structured first draft aligned to its stated job. Manual work still wins for one-off edge cases or when you already have a polished template. The product removes blank-page cost; you keep final judgment.'
+  }
+]
+
+export default function Page() {
+  const NAME = PRODUCT.name
+  return (
+    <>
+      <Head>
+        <link rel="canonical" href={`${SITE}/blog`} />
+        <meta property="og:url" content={`${SITE}/blog`} />
+        <meta property="og:type" content="website" />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqJsonLd(faqs)) }}
+        />
+        {howToBlocks.map((block, i) => (
+          <script
+            key={`howto-${i}`}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(buildHowToJsonLd(block.name, block.steps)),
+            }}
+          />
+        ))}
+        {posts.map((p, i) => (
+          <script
+            key={`article-${i}`}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'Article',
+                '@id': `${SITE}/blog`,
+                mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE}/blog` },
+                headline: p.title,
+                description: p.body,
+                inLanguage: 'en',
+                datePublished: PUBLISHED,
+                dateModified: PUBLISHED,
+                author: { '@type': 'Organization', name: NAME, url: SITE },
+                publisher: {
+                  '@type': 'Organization',
+                  name: NAME,
+                  url: SITE,
+                  logo: { '@type': 'ImageObject', url: `${SITE}/logo.png` },
+                },
+              }),
+            }}
+          />
+        ))}
+
+        <title>{`${NAME} — Blog`}</title>
+        <meta name="description" content="Definitional and how-to posts about meal-planner." />
+      </Head>
+      <div className="min-h-screen bg-slate-50 text-slate-800">
+        <header className="border-b border-slate-200 bg-white">
+          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" className="font-bold text-slate-900">{NAME}</a>
+            <nav className="hidden md:flex gap-6 text-sm font-semibold text-slate-500">
+              <a href="/use-cases" className="hover:text-slate-900">Use cases</a>
+              <a href="/integrations" className="hover:text-slate-900">Integrations</a>
+              <a href="/how-it-works" className="hover:text-slate-900">How it works</a>
+              <a href="/security" className="hover:text-slate-900">Security</a>
+              <a href="/blog" className="hover:text-slate-900">Blog</a>
+            </nav>
+          </div>
+        </header>
+        <main className="max-w-3xl mx-auto px-6 py-14">
+          <h1 className="text-3xl font-bold text-slate-900">Blog</h1>
+          <p className="mt-3 text-slate-600">Definitional and how-to posts that help search engines and humans understand {NAME}.</p>
+
+          <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600">What it does</div>
+              <p className="mt-2 text-sm text-slate-700">{PRODUCT.description || ''}</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600">Who it&apos;s for</div>
+              <p className="mt-2 text-sm text-slate-700">People who need meal-planner's specific outcome without building the workflow from scratch.</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600">Input → output</div>
+              <p className="mt-2 text-sm text-slate-700">Enter the product inputs → review a structured plain-English draft → edit before you act.</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-5">
+              <div className="text-xs font-semibold uppercase tracking-wider text-indigo-600">Note</div>
+              <p className="mt-2 text-sm text-slate-700">Decision-support drafts only. English final review remains a human gate.</p>
+            </div>
+          </section>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+          {posts.map((p) => (
+            <article key={p.slug} className="rounded-xl border border-slate-200 bg-white p-6">
+              <div className="text-xs font-semibold text-indigo-600 mb-1">{p.type}</div>
+              <h3 className="font-semibold text-slate-900">{p.title}</h3>
+              <p className="mt-2 text-sm text-slate-600">{p.body}</p>
+            </article>
+          ))}
+          </div>
+        </main>
+        <footer className="border-t border-slate-200 bg-white">
+          <div className="max-w-5xl mx-auto px-6 py-8 text-sm text-slate-500 flex flex-wrap gap-6">
+            <a href="/security" className="hover:text-slate-900">Security</a>
+            <a href="/use-cases" className="hover:text-slate-900">Use cases</a>
+            <a href="/integrations" className="hover:text-slate-900">Integrations</a>
+            <a href="/how-it-works" className="hover:text-slate-900">How it works</a>
+            <a href="/blog" className="hover:text-slate-900">Blog</a>
+          </div>
+        </footer>
+      </div>
+    </>
+  )
+}
